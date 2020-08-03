@@ -1,5 +1,7 @@
 package com.example.mapping.example;
 
+import com.example.mapping.example.onetomany.Book;
+import com.example.mapping.example.onetomany.BookRepository;
 import com.example.mapping.example.onetoone.Address;
 import com.example.mapping.example.onetoone.AddressRepository;
 import com.example.mapping.example.onetoone.Library;
@@ -10,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Log4j2
@@ -21,6 +24,9 @@ public class MappingExampleApplication implements CommandLineRunner {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private BookRepository bookRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(MappingExampleApplication.class, args);
@@ -48,10 +54,33 @@ public class MappingExampleApplication implements CommandLineRunner {
 
     }
 
+    void manyToOne(){
+
+        Library library = Library.builder()
+                .name("ADV Java")
+                .build();
+
+        Book book = Book.builder()
+                .title("study")
+                .library(library)
+                .build();
+
+        Book book1 = Book.builder()
+                .title("study11")
+                .library(library)
+                .build();
+
+        bookRepository.saveAll(Arrays.asList(book,book1));
+        //final Library save = libraryRepository.save(library);
+
+
+    }
+
 
     @Override
     public void run(String... args) throws Exception {
         save();
         findAll();
+        manyToOne();
     }
 }
