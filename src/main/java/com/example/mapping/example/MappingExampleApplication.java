@@ -42,7 +42,9 @@ public class MappingExampleApplication implements CommandLineRunner {
 
     void findAll() {
         List<Address> all = addressRepository.findAll();
-        log.info(all);
+        all.forEach(x->
+                log.info(x.getLibrary())
+                );
 
     }
 

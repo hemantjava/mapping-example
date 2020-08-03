@@ -20,7 +20,7 @@ public class Library {
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id",referencedColumnName = "id")
     private Address address;
 
 }
