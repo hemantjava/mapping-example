@@ -56,8 +56,12 @@ public class MappingExampleApplication implements CommandLineRunner {
 
     void manyToOne(){
 
+        Address address = Address.builder()
+                .location("HYS")
+                .build();
         Library library = Library.builder()
                 .name("ADV Java")
+                .address(address)
                 .build();
 
         Book book = Book.builder()
@@ -82,5 +86,7 @@ public class MappingExampleApplication implements CommandLineRunner {
         save();
         findAll();
         manyToOne();
+
+        log.info(addressRepository.getName());
     }
 }
