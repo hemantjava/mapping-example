@@ -2,5 +2,9 @@ package com.example.mapping.example.onetoone;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LibraryRepository extends JpaRepository<Library, Long> {}
+import java.util.List;
+
+public interface LibraryRepository extends JpaRepository<Library, Long> {
+    List<LibraryRepository> findTop10ByOrderByIdDesc();
+}
 
