@@ -1,92 +1,82 @@
 package com.example.mapping.example;
 
-import com.example.mapping.example.onetomany.Book;
-import com.example.mapping.example.onetomany.BookRepository;
-import com.example.mapping.example.onetoone.Address;
-import com.example.mapping.example.onetoone.AddressRepository;
-import com.example.mapping.example.onetoone.Library;
-import com.example.mapping.example.onetoone.LibraryRepository;
+import com.example.mapping.example.onetomany.entity.Customer;
+import com.example.mapping.example.onetomany.entity.Product;
+import com.example.mapping.example.onetomany.repository.CustomerRepository;
+import com.example.mapping.example.onetoone.entity.Instructor;
+import com.example.mapping.example.onetoone.entity.InstructorDetails;
+import com.example.mapping.example.onetoone.repository.InstructorRepository;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Log4j2
 @SpringBootApplication
-public class MappingExampleApplication implements CommandLineRunner {
+public class MappingExampleApplication {
 
     @Autowired
-    private LibraryRepository libraryRepository;
+    private CustomerRepository customerRepository;
 
     @Autowired
-    private AddressRepository addressRepository;
-
-    @Autowired
-    private BookRepository bookRepository;
+    private InstructorRepository instructorRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(MappingExampleApplication.class, args);
     }
 
-    void save() {
-
-        final Address address = Address.builder()
-                .location("BLR")
-                .build();
-
-        final Library library = Library.builder()
-                .name("java")
-                .address(address)
-                .build();
-        final Library save = libraryRepository.save(library);
-        log.info(save);
+    @PostConstruct
+    public void init() {
+        final Customer customer = customerRepository.save(getCustomer());
+        System.out.println("Record saved: " + customer);
+        final List<Instructor> instructor = instructorRepository
+            .saveAll(Arrays.asList(getInstructor(), getInstructor1()));
+        System.out.println("Record saved: " + instructor);
+      customer.getProducts().forEach(product -> {
+          System.out.println(product+" "+product.getCustomer());
+      });
     }
 
-    void findAll() {
-        List<Address> all = addressRepository.findAll();
-        all.forEach(x->
-                log.info(x.getLibrary())
-                );
-
+    private Customer getCustomer() {
+        final Customer customer = Customer.builder()
+            .gender("M")
+            .name("Hemant")
+            .build();
+        //First Approach
+        /*final Product tv = Product.builder().name("TV").customer(customer).build();
+        final Product lapTop = Product.builder().name("LapTop").customer(customer).build();
+        final Product shoes = Product.builder().name("Shoes").customer(customer).build();*/
+      //  customer.setProducts(Arrays.asList(tv, lapTop, shoes));//save foreign as well
+        final Product tv = Product.builder().name("TV").build();
+        final Product lapTop = Product.builder().name("LapTop").build();
+        final Product shoes = Product.builder().name("Shoes").build();
+        //Second Approach
+        customer.addProduct(tv,lapTop,shoes);
+        return customer;
     }
 
-    void manyToOne(){
+    private Instructor getInstructor() {
+        return Instructor.builder()
+            .name("Hemant")
+            .instructorDetails(InstructorDetails.builder()
+                .gender("M")
+                .hobby("Coding")
+                .build())
+            .build();
+    }
 
-        Address address = Address.builder()
-                .location("HYS")
-                .build();
-        Library library = Library.builder()
-                .name("ADV Java")
-                .address(address)
-                .build();
-
-        Book book = Book.builder()
-                .title("study")
-                .library(library)
-                .build();
-
-        Book book1 = Book.builder()
-                .title("study11")
-                .library(library)
-                .build();
-
-        bookRepository.saveAll(Arrays.asList(book,book1));
-        //final Library save = libraryRepository.save(library);
-
-
+    private Instructor getInstructor1() {
+        return Instructor.builder()
+            .name("sarita")
+            .instructorDetails(InstructorDetails.builder()
+                .gender("F")
+                .hobby("wondering")
+                .build())
+            .build();
     }
 
 
-    @Override
-    public void run(String... args) throws Exception {
-        save();
-        findAll();
-        manyToOne();
-
-        log.info(addressRepository.getName());
-    }
 }
